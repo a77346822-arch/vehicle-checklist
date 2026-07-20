@@ -223,6 +223,11 @@
   }
   #resetBtn { background: #e5e7eb; color: #374151; }
   #resetBtn:active { background: #d1d5db; }
+  #captureBtn { background: #2563eb; color: #fff; }
+  #captureBtn:active { background: #1d4ed8; }
+  #captureBtn[disabled] { background: #93c5fd; cursor: default; }
+
+  #captureArea { background: #f3f5f8; padding-top: 2px; }
 
   .summary {
     margin-top: 8px;
@@ -268,29 +273,6 @@
     font-size: 12.5px;
   }
   .import-row button { width: auto; padding: 0 14px; margin-bottom: 0; }
-
-  .fab-camera {
-    position: fixed;
-    right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 0;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 999;
-    transition: transform 0.15s ease, background 0.15s ease;
-  }
-  .fab-camera svg { width: 25px; height: 25px; display: block; }
-  .fab-camera:active { background: #1d4ed8; transform: scale(0.93); }
-  .fab-camera[disabled] { opacity: 0.55; cursor: default; }
 </style>
 </head>
 <body>
@@ -336,6 +318,7 @@
 
   <div class="btn-row">
     <button id="resetBtn">전체 초기화</button>
+    <button type="button" id="captureBtn">📷 이미지 복사</button>
   </div>
 
   <div class="admin-panel" id="adminPanel">
@@ -350,14 +333,7 @@
   </div>
 </div>
 
-<button type="button" class="fab-camera" id="screenshotBtn" aria-label="스크린샷 저장" title="스크린샷 저장">
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 8a2 2 0 0 1 2-2h1.17a2 2 0 0 0 1.66-.9l.34-.5A2 2 0 0 1 10.83 4h2.34a2 2 0 0 1 1.66.9l.34.5a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-    <circle cx="12" cy="13" r="3.3" stroke="currentColor" stroke-width="1.8"/>
-  </svg>
-</button>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   var PRISTINE_HTML = document.documentElement.outerHTML;
   var ADMIN_PIN = "1234"; // 관리자 모드 진입 PIN. 필요하면 이 값을 바꾸세요.
@@ -704,61 +680,98 @@
     alert("업데이트된 파일이 다운로드 폴더에 저장되었습니다. 이 파일을 상대방에게 보내주세요.");
   }
 
-  function formatDateForFile() {
-    var d = new Date();
-    function pad(n) { return (n < 10 ? "0" : "") + n; }
-    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes());
+  function pad2(n) { return n < 10 ? "0" + n : "" + n; }
+
+  function buildFilename() {
+    var now = new Date();
+    return "차량점검_" + now.getFullYear() + pad2(now.getMonth() + 1) + pad2(now.getDate()) +
+      "_" + pad2(now.getHours()) + pad2(now.getMinutes()) + ".png";
   }
 
-  function captureScreenshot() {
-    var btn = document.getElementById("screenshotBtn");
-    var target = document.getElementById("captureArea");
-    if (typeof html2canvas === "undefined" || !target) {
-      alert("스크린샷 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.");
+  function openImageForSave(dataUrl, filename) {
+    var win = window.open("", "_blank");
+    if (!win) {
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       return;
     }
+    win.document.write(
+      "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + filename + "</title>" +
+      "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+      "<style>body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;}" +
+      "p{color:#fff;font-size:14px;line-height:1.5;text-align:center;padding:14px 16px;margin:0;background:#1f2430;}" +
+      "img{width:100%;display:block;}</style></head><body>" +
+      "<p>이미지 복사가 지원되지 않는 브라우저입니다.<br>👇 이미지를 <b>길게 눌러</b> <b>'이미지 복사'</b> 또는 <b>'이미지 다운로드'</b>를 선택하세요.</p>" +
+      "<img src='" + dataUrl + "' alt='" + filename + "'>" +
+      "</body></html>"
+    );
+    win.document.close();
+  }
 
-    var originalHtml = btn.innerHTML;
+  function captureChecklist() {
+    var btn = document.getElementById("captureBtn");
+    if (typeof html2canvas === "undefined") {
+      alert("이미지 복사 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침 후 다시 시도해주세요.");
+      return;
+    }
+    var target = document.getElementById("captureArea");
+    var originalLabel = btn.textContent;
     btn.disabled = true;
-    btn.innerHTML = "⏳";
+    btn.textContent = "복사 중...";
 
     function finish() {
       btn.disabled = false;
-      btn.innerHTML = originalHtml;
+      btn.textContent = originalLabel;
     }
 
     html2canvas(target, {
       backgroundColor: "#f3f5f8",
-      scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+      scale: Math.max(2, window.devicePixelRatio || 1),
       useCORS: true
     }).then(function (canvas) {
       canvas.toBlob(function (blob) {
-        if (!blob) { alert("스크린샷 캡처에 실패했습니다."); finish(); return; }
-        var fileName = "차량점검_" + formatDateForFile() + ".png";
-
-        if (navigator.canShare && (function () {
-          try { return navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] }); }
-          catch (e) { return false; }
-        })()) {
-          var file = new File([blob], fileName, { type: "image/png" });
-          navigator.share({ files: [file], title: "차량 점검 체크리스트" })
-            .catch(function () { /* 사용자가 취소한 경우 등은 무시 */ })
-            .then(finish, finish);
-        } else {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-          alert("스크린샷 이미지가 다운로드 폴더(또는 사진 앱)에 저장되었습니다.");
+        if (!blob) {
+          alert("이미지 생성에 실패했습니다.");
           finish();
+          return;
+        }
+
+        // 1순위: 클립보드에 이미지로 바로 복사 (지원 브라우저에서는 바로 붙여넣기 가능)
+        if (navigator.clipboard && window.ClipboardItem) {
+          navigator.clipboard.write([
+            new window.ClipboardItem({ "image/png": blob })
+          ]).then(function () {
+            btn.textContent = "복사됨!";
+            setTimeout(finish, 1200);
+          }).catch(function () {
+            fallbackShareOrView(blob, canvas);
+          });
+        } else {
+          fallbackShareOrView(blob, canvas);
+        }
+
+        function fallbackShareOrView(blob, canvas) {
+          var filename = buildFilename();
+          var file = new File([blob], filename, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: "차량 점검 체크리스트" })
+              .then(finish)
+              .catch(function () {
+                openImageForSave(canvas.toDataURL("image/png"), filename);
+                finish();
+              });
+          } else {
+            openImageForSave(canvas.toDataURL("image/png"), filename);
+            finish();
+          }
         }
       }, "image/png");
-    }).catch(function () {
-      alert("스크린샷 캡처에 실패했습니다.");
+    }).catch(function (err) {
+      alert("이미지 생성에 실패했습니다: " + err);
       finish();
     });
   }
@@ -786,7 +799,7 @@
     render();
   };
   document.getElementById("modeToggleBtn").onclick = toggleMode;
-  document.getElementById("screenshotBtn").onclick = captureScreenshot;
+  document.getElementById("captureBtn").onclick = captureChecklist;
   document.getElementById("saveFileBtn").onclick = saveAsFile;
   document.getElementById("exportBtn").onclick = function () {
     copyText(JSON.stringify(ITEMS));
