@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>차량 점검 체크리스트</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  .noscript-warning {
+    max-width: 520px;
+    margin: 10px auto;
+    padding: 14px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    color: #991b1b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: #f3f5f8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Segoe UI', sans-serif;
+    color: #1f2430;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 10px 10px 14px 10px; }
+
+  .mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+  .mode-label {
+    font-size: 11.5px;
+    font-weight: bold;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #6b7280;
+  }
+  .mode-label.admin { background: #fef3c7; color: #92400e; }
+  .mode-btn {
+    font-size: 12px;
+    color: #2563eb;
+    background: none;
+    border: none;
+    padding: 4px 2px;
+    cursor: pointer;
+  }
+
+  h1 {
+    font-size: 16px;
+    text-align: center;
+    margin: 3px 0 10px 0;
+    color: #111827;
+  }
+
+  #addRow { display: none; }
+  .add-row { flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .add-row select {
+    flex: none;
+    padding: 10px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 13.5px;
+    background: #fff;
+  }
+  .add-row input {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+  }
+  .add-row input:focus { border-color: #2563eb; }
+  .add-row button {
+    flex: none;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .add-row button:active { background: #1d4ed8; }
+
+  .table-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(20,20,40,0.08);
+    border: 1px solid #e5e7eb;
+  }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #d1d5db; }
+  thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 12px;
+    padding: 7px 4px;
+    border: 1px solid #d1d5db;
+  }
+  thead th:nth-child(1) { width: 8%; text-align: center; }
+  thead th:nth-child(2) { width: 13%; text-align: center; }
+  thead th:nth-child(3) { width: 45%; text-align: center; }
+  thead th:nth-child(4), thead th:nth-child(5) { width: 17%; text-align: center; }
+
+  tbody td {
+    border: 1px solid #d1d5db;
+    padding: 0;
+  }
+
+  .category-cell {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 12.5px;
+    color: #374151;
+    background: #f8fafc;
+    border: 2px solid #d1d5db;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 2px;
+    padding: 6px 0 !important;
+  }
+
+  .brand-cell {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 12px;
+    background: #fbfcfe;
+    padding: 5px 2px !important;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .item-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1.25;
+    padding: 8px 4px;
+    color: #000000;
+    overflow: hidden;
+  }
+  .item-name .name-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    padding: 3px 2px;
+    outline: none;
+    border-bottom: 1.5px solid transparent;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .item-name .name-input:focus { border-bottom-color: #2563eb; }
+  .item-name .name-static {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+  .item-name .del-btn {
+    flex: none;
+    width: 22px; height: 22px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 50%;
+    background: #f1f2f5;
+    color: #9ca3af;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .item-name .del-btn:active { background: #e5e7eb; }
+
+  .empty-row { padding: 22px 14px; text-align: center; color: #9ca3af; font-size: 13px; }
+
+  .tapcell {
+    height: 42px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border-left: 1px solid #eef0f4;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .tapcell .mark {
+    display: inline-block;
+    width: 24px; height: 24px;
+    line-height: 24px;
+    font-size: 17px;
+    font-weight: bold;
+    color: transparent;
+  }
+  .tapcell.normal.selected { background: #ecfdf5; }
+  .tapcell.normal.selected .mark { color: #16a34a; }
+  .tapcell.abnormal.selected { background: #fef2f2; }
+  .tapcell.abnormal.selected .mark { color: #dc2626; }
+  .tapcell:active { background: #f1f5f9; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+  .btn-row button {
+    flex: 1;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 9px;
+    border: none;
+    cursor: pointer;
+  }
+  #resetBtn { background: #e5e7eb; color: #374151; }
+  #resetBtn:active { background: #d1d5db; }
+
+  .summary {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .summary b { color: #111827; }
+
+  #adminPanel { display: none; }
+  .admin-panel {
+    margin-top: 18px;
+    padding: 14px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+  }
+  .admin-panel .panel-title {
+    font-size: 12.5px;
+    font-weight: bold;
+    color: #92400e;
+    margin-bottom: 10px;
+  }
+  .admin-panel button {
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    border-radius: 8px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .admin-panel button:active { background: #d97706; }
+  .import-row { display: flex; gap: 6px; }
+  .import-row input {
+    flex: 1;
+    padding: 9px 10px;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    font-size: 12.5px;
+  }
+  .import-row button { width: auto; padding: 0 14px; margin-bottom: 0; }
+
+  .fab-camera {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .fab-camera svg { width: 25px; height: 25px; display: block; }
+  .fab-camera:active { background: #1d4ed8; transform: scale(0.93); }
+  .fab-camera[disabled] { opacity: 0.55; cursor: default; }
+</style>
+</head>
+<body>
+<noscript>
+  <div class="noscript-warning">
+    ⚠ 이 화면은 미리보기 상태라 정상 작동하지 않습니다.<br>
+    파일을 <b>다른 앱으로 열기 → Chrome(또는 Safari)</b> 으로 다시 열어주세요.
+  </div>
+</noscript>
+<div class="wrap">
+  <div class="mode-row">
+    <span class="mode-label" id="modeLabel">실행 모드</span>
+    <button type="button" class="mode-btn" id="modeToggleBtn">관리자 모드</button>
+  </div>
+
+  <div class="add-row" id="addRow">
+    <select id="categorySelect"></select>
+    <select id="brandSelect"></select>
+    <input type="text" id="itemInput" placeholder="점검 항목 추가" />
+    <button id="addItemBtn">추가</button>
+  </div>
+
+  <div id="captureArea">
+    <h1>차량 점검 체크리스트</h1>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>브랜드</th>
+            <th>항목</th>
+            <th>정상</th>
+            <th>비정상</th>
+          </tr>
+        </thead>
+        <tbody id="checklistBody"></tbody>
+      </table>
+    </div>
+
+    <div class="summary" id="summary"></div>
+  </div>
+
+  <div class="btn-row">
+    <button id="resetBtn">전체 초기화</button>
+  </div>
+
+  <div class="admin-panel" id="adminPanel">
+    <div class="panel-title">수정한 내용을 다른 사람에게 전달하기</div>
+    <button type="button" id="saveFileBtn">업데이트된 파일로 저장 (다운로드)</button>
+    <div class="panel-title" style="margin-top:4px;">또는 코드로 전달하기</div>
+    <button type="button" id="exportBtn">현재 항목 목록 복사하기</button>
+    <div class="import-row">
+      <input type="text" id="importInput" placeholder="다른 기기의 코드를 붙여넣기" />
+      <button type="button" id="importBtn">가져오기</button>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="fab-camera" id="screenshotBtn" aria-label="스크린샷 저장" title="스크린샷 저장">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 8a2 2 0 0 1 2-2h1.17a2 2 0 0 0 1.66-.9l.34-.5A2 2 0 0 1 10.83 4h2.34a2 2 0 0 1 1.66.9l.34.5a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="12" cy="13" r="3.3" stroke="currentColor" stroke-width="1.8"/>
+  </svg>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  var PRISTINE_HTML = document.documentElement.outerHTML;
+  var ADMIN_PIN = "1234"; // 관리자 모드 진입 PIN. 필요하면 이 값을 바꾸세요.
+
+  var BRAND_COLORS = {
+    "ALL": "#2563eb",
+    "BMW": "#000000",
+    "MINI": "#dc2626"
+  };
+  var DEFAULT_BRAND_COLOR = "#000000";
+
+  var DEFAULT_ITEMS = [
+    { category: "실외", brands: [
+      { brand: "ALL", items: ["전조등 변색", "타이어 마모"] },
+      { brand: "BMW", items: ["키드니 그릴 벗겨짐 ( G60 )", "선루프 몰딩 변형 ( X시리즈 )", "휠 부식"] },
+      { brand: "MINI", items: ["가니쉬 오염"] }
+    ]},
+    { category: "실내", brands: [
+      { brand: "ALL", items: ["블랙박스 불량"] },
+      { brand: "BMW", items: ["B/C 버튼 불량", "에어백 주름"] }
+    ]}
+  ];
+
+  var STORAGE_KEY = "vehicleChecklistData";
+  var ADMIN_FLAG_KEY = "vehicleChecklistIsAdmin";
+
+  var ITEMS = [];
+  var state = {};
+  var isAdmin = false;
+
+  function isValidItems(x) {
+    return Array.isArray(x) && x.every(function (c) {
+      return c && typeof c.category === "string" && Array.isArray(c.brands) &&
+        c.brands.every(function (b) { return b && typeof b.brand === "string" && Array.isArray(b.items); });
+    });
+  }
+
+  function loadData() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        ITEMS = isValidItems(parsed.items) ? parsed.items : JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        state = parsed.checks || {};
+      } else {
+        ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        state = {};
+      }
+    } catch (e) {
+      ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      state = {};
+    }
+    try {
+      isAdmin = localStorage.getItem(ADMIN_FLAG_KEY) === "1";
+    } catch (e) {
+      isAdmin = false;
+    }
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: ITEMS, checks: state }));
+    } catch (e) {}
+  }
+
+  function saveAdminFlag() {
+    try { localStorage.setItem(ADMIN_FLAG_KEY, isAdmin ? "1" : "0"); } catch (e) {}
+  }
+
+  function allNames() {
+    var names = [];
+    ITEMS.forEach(function (cat) {
+      cat.brands.forEach(function (b) { b.items.forEach(function (n) { names.push(n); }); });
+    });
+    return names;
+  }
+
+  function findLocation(name) {
+    for (var i = 0; i < ITEMS.length; i++) {
+      var brands = ITEMS[i].brands;
+      for (var j = 0; j < brands.length; j++) {
+        var idx = brands[j].items.indexOf(name);
+        if (idx !== -1) return { catIndex: i, brandIndex: j, itemIndex: idx };
+      }
+    }
+    return null;
+  }
+
+  function categoryItemCount(cat) {
+    var n = 0;
+    cat.brands.forEach(function (b) { n += b.items.length; });
+    return n;
+  }
+
+  function renderCategorySelect() {
+    var sel = document.getElementById("categorySelect");
+    var prev = sel.value;
+    sel.innerHTML = "";
+    ITEMS.forEach(function (cat) {
+      var opt = document.createElement("option");
+      opt.value = cat.category;
+      opt.text = cat.category;
+      sel.appendChild(opt);
+    });
+    var found = false;
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === prev) found = true;
+    if (found) sel.value = prev;
+    renderBrandSelect();
+  }
+
+  function renderBrandSelect() {
+    var catSel = document.getElementById("categorySelect");
+    var brandSel = document.getElementById("brandSelect");
+    var prev = brandSel.value;
+    brandSel.innerHTML = "";
+    var cat = null;
+    for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].category === catSel.value) cat = ITEMS[i];
+    if (cat) {
+      cat.brands.forEach(function (b) {
+        var opt = document.createElement("option");
+        opt.value = b.brand;
+        opt.text = b.brand;
+        brandSel.appendChild(opt);
+      });
+    }
+    var found = false;
+    for (var j = 0; j < brandSel.options.length; j++) if (brandSel.options[j].value === prev) found = true;
+    if (found) brandSel.value = prev;
+  }
+
+  function renderMode() {
+    var label = document.getElementById("modeLabel");
+    var btn = document.getElementById("modeToggleBtn");
+    var addRow = document.getElementById("addRow");
+    var adminPanel = document.getElementById("adminPanel");
+
+    if (isAdmin) {
+      label.textContent = "관리자 모드";
+      label.className = "mode-label admin";
+      btn.textContent = "잠그기 (실행 모드로)";
+      addRow.style.display = "flex";
+      adminPanel.style.display = "block";
+    } else {
+      label.textContent = "실행 모드";
+      label.className = "mode-label";
+      btn.textContent = "관리자 모드";
+      addRow.style.display = "none";
+      adminPanel.style.display = "none";
+    }
+  }
+
+  function toggleMode() {
+    if (isAdmin) {
+      isAdmin = false;
+    } else {
+      var pin = window.prompt("관리자 PIN을 입력하세요");
+      if (pin === null) return;
+      if (pin !== ADMIN_PIN) { alert("PIN이 올바르지 않습니다."); return; }
+      isAdmin = true;
+    }
+    saveAdminFlag();
+    renderMode();
+    render();
+  }
+
+  function render() {
+    var body = document.getElementById("checklistBody");
+    body.innerHTML = "";
+    renderCategorySelect();
+
+    if (allNames().length === 0) {
+      var tr0 = document.createElement("tr");
+      var td0 = document.createElement("td");
+      td0.colSpan = 5;
+      td0.className = "empty-row";
+      td0.textContent = isAdmin ? "점검 항목이 없습니다. 위에서 추가해주세요." : "표시할 점검 항목이 없습니다.";
+      tr0.appendChild(td0);
+      body.appendChild(tr0);
+      renderSummary();
+      return;
+    }
+
+    ITEMS.forEach(function (cat) {
+      var catTotal = categoryItemCount(cat);
+      if (catTotal === 0) return;
+      var catCellPlaced = false;
+
+      cat.brands.forEach(function (b) {
+        if (b.items.length === 0) return;
+
+        b.items.forEach(function (name, i) {
+          var tr = document.createElement("tr");
+
+          if (!catCellPlaced) {
+            var catTd = document.createElement("td");
+            catTd.className = "category-cell";
+            catTd.rowSpan = catTotal;
+            catTd.textContent = cat.category;
+            tr.appendChild(catTd);
+            catCellPlaced = true;
+          }
+
+          if (i === 0) {
+            var brandTd = document.createElement("td");
+            brandTd.className = "brand-cell";
+            brandTd.rowSpan = b.items.length;
+            brandTd.textContent = b.brand;
+            brandTd.style.color = BRAND_COLORS[b.brand] || DEFAULT_BRAND_COLOR;
+            tr.appendChild(brandTd);
+          }
+
+          var nameTd = document.createElement("td");
+          var nameDiv = document.createElement("div");
+          nameDiv.className = "item-name";
+
+          if (isAdmin) {
+            var nameInput = document.createElement("input");
+            nameInput.type = "text";
+            nameInput.className = "name-input";
+            nameInput.value = name;
+            nameInput.onblur = function () { commitRename(name, this); };
+            nameInput.onkeypress = function (e) { if (e.key === "Enter") this.blur(); };
+            nameDiv.appendChild(nameInput);
+
+            var delBtn = document.createElement("span");
+            delBtn.className = "del-btn";
+            delBtn.textContent = "×";
+            delBtn.onclick = function () { removeItem(name); };
+            nameDiv.appendChild(delBtn);
+          } else {
+            var nameStatic = document.createElement("span");
+            nameStatic.className = "name-static";
+            nameStatic.textContent = name;
+            nameDiv.appendChild(nameStatic);
+          }
+
+          nameTd.appendChild(nameDiv);
+          tr.appendChild(nameTd);
+
+          tr.appendChild(makeCell(name, "normal"));
+          tr.appendChild(makeCell(name, "abnormal"));
+
+          body.appendChild(tr);
+        });
+      });
+    });
+    renderSummary();
+  }
+
+  function makeCell(name, kind) {
+    var td = document.createElement("td");
+    td.className = "tapcell " + kind;
+    if (state[name] === kind) td.className += " selected";
+    var mark = document.createElement("span");
+    mark.className = "mark";
+    mark.textContent = "O";
+    td.appendChild(mark);
+    td.onclick = function () { onTap(name, kind); };
+    return td;
+  }
+
+  function onTap(name, kind) {
+    if (state[name] === kind) {
+      delete state[name];
+    } else {
+      state[name] = kind;
+    }
+    saveData();
+    render();
+  }
+
+  function addItem() {
+    if (!isAdmin) return;
+    var catValue = document.getElementById("categorySelect").value;
+    var brandValue = document.getElementById("brandSelect").value;
+    var input = document.getElementById("itemInput");
+    var name = input.value.replace(/^\s+|\s+$/g, "");
+    if (name.length === 0) return;
+    if (name.length > 40) { alert("항목 이름은 40자 이내로 입력해주세요."); return; }
+    if (allNames().indexOf(name) !== -1) { input.value = ""; return; }
+    var cat = null;
+    for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].category === catValue) cat = ITEMS[i];
+    if (!cat) return;
+    var brand = null;
+    for (var j = 0; j < cat.brands.length; j++) if (cat.brands[j].brand === brandValue) brand = cat.brands[j];
+    if (!brand) return;
+    brand.items.push(name);
+    input.value = "";
+    saveData();
+    render();
+  }
+
+  function commitRename(oldName, inputEl) {
+    if (!isAdmin) return;
+    var newName = inputEl.value.replace(/^\s+|\s+$/g, "");
+    if (newName.length === 0 || newName.length > 40) { inputEl.value = oldName; return; }
+    if (newName === oldName) return;
+    if (allNames().indexOf(newName) !== -1) { alert("이미 있는 항목 이름입니다."); inputEl.value = oldName; return; }
+    var loc = findLocation(oldName);
+    if (!loc) return;
+    ITEMS[loc.catIndex].brands[loc.brandIndex].items[loc.itemIndex] = newName;
+    if (state.hasOwnProperty(oldName)) {
+      state[newName] = state[oldName];
+      delete state[oldName];
+    }
+    saveData();
+    render();
+  }
+
+  function removeItem(name) {
+    if (!isAdmin) return;
+    var loc = findLocation(name);
+    if (!loc) return;
+    ITEMS[loc.catIndex].brands[loc.brandIndex].items.splice(loc.itemIndex, 1);
+    delete state[name];
+    saveData();
+    render();
+  }
+
+  function renderSummary() {
+    var total = allNames().length;
+    var checked = Object.keys(state).length;
+    var abnormal = 0;
+    for (var k in state) if (state[k] === "abnormal") abnormal++;
+    document.getElementById("summary").innerHTML =
+      "점검 완료: <b>" + checked + "</b> / " + total +
+      "&nbsp;&nbsp;·&nbsp;&nbsp;비정상: <b>" + abnormal + "</b>건";
+  }
+
+  function saveAsFile() {
+    var updatedHtml = PRISTINE_HTML.replace(
+      /var DEFAULT_ITEMS = \[[\s\S]*?\];/,
+      "var DEFAULT_ITEMS = " + JSON.stringify(ITEMS) + ";"
+    );
+    var blob = new Blob(["<!DOCTYPE html>\n" + updatedHtml], { type: "text/html;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "차량 점검 체크리스트.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    alert("업데이트된 파일이 다운로드 폴더에 저장되었습니다. 이 파일을 상대방에게 보내주세요.");
+  }
+
+  function formatDateForFile() {
+    var d = new Date();
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes());
+  }
+
+  function captureScreenshot() {
+    var btn = document.getElementById("screenshotBtn");
+    var target = document.getElementById("captureArea");
+    if (typeof html2canvas === "undefined" || !target) {
+      alert("스크린샷 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.");
+      return;
+    }
+
+    var originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "⏳";
+
+    function finish() {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+
+    html2canvas(target, {
+      backgroundColor: "#f3f5f8",
+      scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+      useCORS: true
+    }).then(function (canvas) {
+      canvas.toBlob(function (blob) {
+        if (!blob) { alert("스크린샷 캡처에 실패했습니다."); finish(); return; }
+        var fileName = "차량점검_" + formatDateForFile() + ".png";
+
+        if (navigator.canShare && (function () {
+          try { return navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] }); }
+          catch (e) { return false; }
+        })()) {
+          var file = new File([blob], fileName, { type: "image/png" });
+          navigator.share({ files: [file], title: "차량 점검 체크리스트" })
+            .catch(function () { /* 사용자가 취소한 경우 등은 무시 */ })
+            .then(finish, finish);
+        } else {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          alert("스크린샷 이미지가 다운로드 폴더(또는 사진 앱)에 저장되었습니다.");
+          finish();
+        }
+      }, "image/png");
+    }).catch(function () {
+      alert("스크린샷 캡처에 실패했습니다.");
+      finish();
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert("복사되었습니다. 다른 기기의 '가져오기' 칸에 붙여넣으세요.");
+      }, function () {
+        window.prompt("복사에 실패했습니다. 아래 코드를 직접 복사하세요:", text);
+      });
+    } else {
+      window.prompt("아래 코드를 복사하세요:", text);
+    }
+  }
+
+  document.getElementById("addItemBtn").onclick = addItem;
+  document.getElementById("itemInput").onkeypress = function (e) {
+    if (e.key === "Enter") addItem();
+  };
+  document.getElementById("categorySelect").onchange = renderBrandSelect;
+  document.getElementById("resetBtn").onclick = function () {
+    state = {};
+    saveData();
+    render();
+  };
+  document.getElementById("modeToggleBtn").onclick = toggleMode;
+  document.getElementById("screenshotBtn").onclick = captureScreenshot;
+  document.getElementById("saveFileBtn").onclick = saveAsFile;
+  document.getElementById("exportBtn").onclick = function () {
+    copyText(JSON.stringify(ITEMS));
+  };
+  document.getElementById("importBtn").onclick = function () {
+    if (!isAdmin) return;
+    var raw = document.getElementById("importInput").value.replace(/^\s+|\s+$/g, "");
+    if (!raw) return;
+    try {
+      var imported = JSON.parse(raw);
+      if (!isValidItems(imported)) throw new Error("invalid");
+      ITEMS = imported;
+      state = {};
+      saveData();
+      document.getElementById("importInput").value = "";
+      render();
+      alert("항목 목록을 적용했습니다.");
+    } catch (e) {
+      alert("코드 형식이 올바르지 않습니다.");
+    }
+  };
+
+  loadData();
+  renderMode();
+  render();
+</script>
+</body>
+</html>
