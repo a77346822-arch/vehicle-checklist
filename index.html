@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   .noscript-warning {
-    max-width: 560px;
+    max-width: 620px;
     margin: 10px auto;
     padding: 14px;
     background: #fef2f2;
@@ -24,7 +24,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Segoe UI', sans-serif;
     color: #1f2430;
   }
-  .wrap { max-width: 560px; margin: 0 auto; padding: 10px 14px 14px 14px; }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 10px 14px 14px 14px; }
 
   h1 {
     font-size: 16px;
@@ -71,38 +71,45 @@
     border-radius: 14px;
     box-shadow: 0 2px 10px rgba(20,20,40,0.08);
     border: 1px solid #e5e7eb;
-    overflow: hidden;
   }
-  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 14px; }
 
-  table { border-collapse: collapse; width: 100%; min-width: 520px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 600px;
+    table-layout: fixed;
+  }
 
   thead th {
     background: #f8fafc;
     color: #111827;
     font-size: 12.5px;
     font-weight: bold;
-    padding: 9px 4px;
+    padding: 11px 4px;
     border-bottom: 2px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
     text-align: center;
     white-space: nowrap;
   }
-  thead th.th-cat { background: #1e3a6e; color: #fff; }
+  thead th:last-child { border-right: none; }
+  thead th.th-cat { background: #1e3a6e; color: #fff; border-top-left-radius: 13px; }
   thead th.th-normal { color: #1d4ed8; }
   thead th.th-abnormal { color: #dc2626; }
+  thead th:last-child { border-top-right-radius: 13px; }
 
-  col.col-cat { width: 60px; }
-  col.col-item { width: 190px; }
-  col.col-normal { width: 56px; }
-  col.col-abnormal { width: 56px; }
-  col.col-note { width: 130px; }
+  col.col-cat { width: 62px; }
+  col.col-item { width: 260px; }
+  col.col-normal { width: 66px; }
+  col.col-abnormal { width: 66px; }
+  col.col-note { width: 140px; }
 
   td.cat-cell {
     text-align: center;
     vertical-align: middle;
     font-size: 13px;
     font-weight: bold;
-    padding: 8px 4px;
+    padding: 14px 4px;
     border-right: 1px solid #e5e7eb;
   }
   td.cat-cell.warranty { background: #eaf2fb; color: #1d4ed8; }
@@ -110,14 +117,14 @@
   td.cat-cell .cat-icon { width: 26px; height: 26px; margin: 0 auto 4px auto; }
 
   td.item-cell {
-    padding: 8px 8px;
+    padding: 14px 8px;
     border-top: 1px solid #f1f3f6;
     border-right: 1px solid #f1f3f6;
   }
-  .item-inner { display: flex; align-items: center; gap: 8px; }
+  .item-inner { display: flex; align-items: center; gap: 10px; }
   .item-icon {
     flex: none;
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
     color: #4b5563;
@@ -125,13 +132,14 @@
   }
   .warranty-row .item-icon { color: #1d4ed8; background: #eaf2fb; }
   .accident-row .item-icon { color: #dc2626; background: #fbe9ea; }
-  .item-name { font-size: 13px; font-weight: bold; color: #111827; line-height: 1.3; }
+  .item-name { font-size: 13px; font-weight: bold; color: #111827; line-height: 1.4; }
+  .item-desc { font-weight: normal; color: #6b7280; }
 
   td.tapcell {
     border-top: 1px solid #f1f3f6;
     border-right: 1px solid #f1f3f6;
     text-align: center;
-    padding: 6px 4px;
+    padding: 12px 4px;
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;
@@ -139,7 +147,7 @@
   td.tapcell .mark {
     display: inline-flex;
     align-items: center; justify-content: center;
-    width: 26px; height: 26px;
+    width: 28px; height: 28px;
     border-radius: 7px;
     font-size: 14px; font-weight: bold;
     border: 1.5px solid #e5e7eb;
@@ -149,11 +157,11 @@
   td.tapcell.abnormal.selected .mark { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
   td.tapcell:active .mark { background: #f1f5f9; }
 
-  td.note-cell { padding: 6px 6px; border-top: 1px solid #f1f3f6; }
+  td.note-cell { padding: 10px 6px; border-top: 1px solid #f1f3f6; }
   td.note-cell input {
     width: 100%;
     font-size: 12px;
-    padding: 6px 7px;
+    padding: 7px 7px;
     border: 1px solid #e5e7eb;
     border-radius: 7px;
     outline: none;
@@ -161,6 +169,9 @@
     background: #fafafa;
   }
   td.note-cell input:focus { border-color: #9ca3af; background: #fff; }
+
+  tbody tr:last-child td.cat-cell { border-bottom-left-radius: 13px; }
+  tbody tr:last-child td.note-cell { border-bottom-right-radius: 13px; }
 
   .summary {
     margin-top: 8px;
@@ -237,6 +248,7 @@
     headlight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>',
     grille: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M3 14h18M9 6v12M15 6v12"/></svg>',
     wheel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>',
+    tire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.2"/></svg>',
     shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>',
     alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
     bumper: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l1.5-5A2 2 0 0 1 7.4 9.5h9.2a2 2 0 0 1 1.9 1.5L20 16"/><rect x="3" y="16" width="18" height="4" rx="1"/><circle cx="7.5" cy="20" r="1.3"/><circle cx="16.5" cy="20" r="1.3"/></svg>',
@@ -249,31 +261,35 @@
     {
       key: "보증", cls: "warranty", icon: "shield",
       items: [
-        { name: "전조등 변색", icon: "headlight" },
-        { name: "키드니 그릴 벗겨짐", icon: "grille" },
-        { name: "휠 부식", icon: "wheel" }
+        { name: "전조등", desc: "(주간주행등 LED 변색)", icon: "headlight" },
+        { name: "키드니 그릴", desc: "(클리어 코팅 벗겨짐)", icon: "grille" },
+        { name: "휠", desc: "(엠블럼 주변 부식)", icon: "wheel" }
       ]
     },
     {
       key: "사고", cls: "accident", icon: "alert",
       items: [
-        { name: "앞유리 손상", icon: "glass" },
-        { name: "범퍼 손상", icon: "bumper" },
-        { name: "도어 손상", icon: "door" },
-        { name: "휀다 손상", icon: "fender" },
-        { name: "휠/타이어 손상", icon: "wheel" }
+        { name: "앞유리", desc: "(스톤칩·균열)", icon: "glass" },
+        { name: "범퍼", desc: "(스크래치·찌그러짐)", icon: "bumper" },
+        { name: "도어", desc: "(문콕·찌그러짐)", icon: "door" },
+        { name: "휀다", desc: "(스크래치·찌그러짐)", icon: "fender" },
+        { name: "휠", desc: "(스크래치·찍힘)", icon: "wheel" },
+        { name: "타이어", desc: "(손상·마모)", icon: "tire" }
       ]
     }
   ];
 
   // DEFAULT_CATEGORIES 목록을 수정할 때마다 이 숫자를 1씩 올려주세요.
-  var ITEMS_VERSION = 6;
+  var ITEMS_VERSION = 7;
   var STORAGE_KEY = "vehicleChecklistData";
 
   var CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
   var state = {};
   var notes = {};
   var carNumber = "";
+
+  // 같은 이름(예: 보증-휠 / 사고-휠)이 섞이지 않도록 카테고리+이름으로 고유 id 생성
+  function itemId(cat, it) { return cat.key + "-" + it.name + "-" + it.desc; }
 
   function loadData() {
     try {
@@ -300,10 +316,10 @@
     } catch (e) {}
   }
 
-  function allNames() {
-    var names = [];
-    CATEGORIES.forEach(function (cat) { cat.items.forEach(function (it) { names.push(it.name); }); });
-    return names;
+  function allIds() {
+    var ids = [];
+    CATEGORIES.forEach(function (cat) { cat.items.forEach(function (it) { ids.push(itemId(cat, it)); }); });
+    return ids;
   }
 
   function render() {
@@ -312,6 +328,7 @@
 
     CATEGORIES.forEach(function (cat) {
       cat.items.forEach(function (it, idx) {
+        var id = itemId(cat, it);
         var tr = document.createElement("tr");
         tr.className = cat.cls + "-row";
 
@@ -327,20 +344,20 @@
         itemTd.className = "item-cell";
         itemTd.innerHTML =
           '<div class="item-inner"><div class="item-icon">' + ICONS[it.icon] + '</div>' +
-          '<div class="item-name">' + it.name + '</div></div>';
+          '<div class="item-name">' + it.name + ' <span class="item-desc">' + it.desc + '</span></div></div>';
         tr.appendChild(itemTd);
 
-        tr.appendChild(makeCell(it.name, "normal"));
-        tr.appendChild(makeCell(it.name, "abnormal"));
+        tr.appendChild(makeCell(id, "normal"));
+        tr.appendChild(makeCell(id, "abnormal"));
 
         var noteTd = document.createElement("td");
         noteTd.className = "note-cell";
         var noteInput = document.createElement("input");
         noteInput.type = "text";
         noteInput.placeholder = "내용 입력";
-        noteInput.value = notes[it.name] || "";
+        noteInput.value = notes[id] || "";
         noteInput.oninput = function () {
-          notes[it.name] = this.value;
+          notes[id] = this.value;
           saveData();
         };
         noteTd.appendChild(noteInput);
@@ -353,26 +370,26 @@
     renderSummary();
   }
 
-  function makeCell(name, kind) {
+  function makeCell(id, kind) {
     var td = document.createElement("td");
-    td.className = "tapcell " + kind + (state[name] === kind ? " selected" : "");
+    td.className = "tapcell " + kind + (state[id] === kind ? " selected" : "");
     var mark = document.createElement("span");
     mark.className = "mark";
     mark.textContent = "O";
     td.appendChild(mark);
-    td.onclick = function () { onTap(name, kind); };
+    td.onclick = function () { onTap(id, kind); };
     return td;
   }
 
-  function onTap(name, kind) {
-    if (state[name] === kind) delete state[name];
-    else state[name] = kind;
+  function onTap(id, kind) {
+    if (state[id] === kind) delete state[id];
+    else state[id] = kind;
     saveData();
     render();
   }
 
   function renderSummary() {
-    var total = allNames().length;
+    var total = allIds().length;
     var checked = Object.keys(state).length;
     var abnormal = 0;
     for (var k in state) if (state[k] === "abnormal") abnormal++;
