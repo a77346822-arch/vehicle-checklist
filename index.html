@@ -223,9 +223,36 @@
   }
   #resetBtn { background: #e5e7eb; color: #374151; }
   #resetBtn:active { background: #d1d5db; }
-  #captureBtn { background: #2563eb; color: #fff; }
-  #captureBtn:active { background: #1d4ed8; }
-  #captureBtn[disabled] { background: #93c5fd; cursor: default; }
+
+  .car-number-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    border-radius: 9px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+  }
+  .car-number-group label {
+    flex: none;
+    font-size: 12.5px;
+    font-weight: bold;
+    color: #3730a3;
+    white-space: nowrap;
+  }
+  .car-number-group input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 13.5px;
+    font-weight: bold;
+    color: #111827;
+    padding: 9px 0;
+    outline: none;
+    text-align: center;
+  }
 
   #captureArea { background: #f3f5f8; padding-top: 2px; }
 
@@ -318,7 +345,10 @@
 
   <div class="btn-row">
     <button id="resetBtn">전체 초기화</button>
-    <button type="button" id="captureBtn">📷 앨범에 저장</button>
+    <div class="car-number-group">
+      <label for="carNumberInput">차번호</label>
+      <input type="text" id="carNumberInput" placeholder="예: 12가 3456" />
+    </div>
   </div>
 
   <div class="admin-panel" id="adminPanel">
@@ -333,7 +363,6 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   var PRISTINE_HTML = document.documentElement.outerHTML;
   var ADMIN_PIN = "1234"; // 관리자 모드 진입 PIN. 필요하면 이 값을 바꾸세요.
@@ -352,8 +381,8 @@
       { brand: "MINI", items: ["가니쉬 오염"] }
     ]},
     { category: "실내", brands: [
-      { brand: "ALL", items: ["블랙박스 불량"] },
-      { brand: "BMW", items: ["B/C 버튼 불량", "에어백 주름"] }
+      { brand: "ALL", items: ["시트 커버 불량(균열 / 겹쳐짐)"] },
+      { brand: "BMW", items: ["에어백 주름"] }
     ]}
   ];
 
@@ -363,6 +392,7 @@
   var ITEMS = [];
   var state = {};
   var isAdmin = false;
+  var carNumber = "";
 
   function isValidItems(x) {
     return Array.isArray(x) && x.every(function (c) {
@@ -378,13 +408,16 @@
         var parsed = JSON.parse(raw);
         ITEMS = isValidItems(parsed.items) ? parsed.items : JSON.parse(JSON.stringify(DEFAULT_ITEMS));
         state = parsed.checks || {};
+        carNumber = typeof parsed.carNumber === "string" ? parsed.carNumber : "";
       } else {
         ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
         state = {};
+        carNumber = "";
       }
     } catch (e) {
       ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
       state = {};
+      carNumber = "";
     }
     try {
       isAdmin = localStorage.getItem(ADMIN_FLAG_KEY) === "1";
@@ -395,7 +428,7 @@
 
   function saveData() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: ITEMS, checks: state }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: ITEMS, checks: state, carNumber: carNumber }));
     } catch (e) {}
   }
 
@@ -680,113 +713,6 @@
     alert("업데이트된 파일이 다운로드 폴더에 저장되었습니다. 이 파일을 상대방에게 보내주세요.");
   }
 
-  function pad2(n) { return n < 10 ? "0" + n : "" + n; }
-
-  function buildFilename() {
-    var now = new Date();
-    return "차량점검_" + now.getFullYear() + pad2(now.getMonth() + 1) + pad2(now.getDate()) +
-      "_" + pad2(now.getHours()) + pad2(now.getMinutes()) + ".png";
-  }
-
-  function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  }
-
-  function openImageForSave(dataUrl, filename) {
-    var win = window.open("", "_blank");
-    if (!win) {
-      var a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return;
-    }
-    win.document.write(
-      "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + filename + "</title>" +
-      "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-      "<style>body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;}" +
-      "p{color:#fff;font-size:14px;line-height:1.5;text-align:center;padding:14px 16px;margin:0;background:#1f2430;}" +
-      "img{width:100%;display:block;}</style></head><body>" +
-      "<p>👇 이미지를 <b>길게 눌러</b> <b>'이미지 다운로드'</b> 또는 <b>'이미지 저장'</b>을 선택하면<br>갤러리(사진 앱)에 저장됩니다.</p>" +
-      "<img src='" + dataUrl + "' alt='" + filename + "'>" +
-      "</body></html>"
-    );
-    win.document.close();
-  }
-
-  function downloadBlobDirect(blob, filename) {
-    // Android/PC: 다운로드 링크를 즉시 클릭 → 별도 시트 없이 바로 저장됨
-    // (안드로이드는 다운로드 폴더가 갤러리 앱에도 함께 표시됨)
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-  }
-
-  function captureChecklist() {
-    var btn = document.getElementById("captureBtn");
-    if (typeof html2canvas === "undefined") {
-      alert("이미지 저장 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침 후 다시 시도해주세요.");
-      return;
-    }
-    var target = document.getElementById("captureArea");
-    var originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "저장 중...";
-
-    function finish() {
-      btn.disabled = false;
-      btn.textContent = originalLabel;
-    }
-
-    html2canvas(target, {
-      backgroundColor: "#f3f5f8",
-      scale: Math.max(2, window.devicePixelRatio || 1),
-      useCORS: true
-    }).then(function (canvas) {
-      canvas.toBlob(function (blob) {
-        if (!blob) {
-          alert("이미지 생성에 실패했습니다.");
-          finish();
-          return;
-        }
-        var filename = buildFilename();
-
-        if (isIOS()) {
-          // iOS는 브라우저 정책상 버튼 클릭만으로 사진 앱에 바로 쓸 수 없고,
-          // 반드시 시스템 공유 시트에서 사용자가 "이미지 저장"을 한 번 눌러야
-          // 사진 앱에 저장됩니다. (Safari의 보안 정책으로, 웹사이트는 우회할 수 없습니다)
-          var file = new File([blob], filename, { type: "image/png" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({ files: [file], title: "차량 점검 체크리스트" })
-              .then(finish)
-              .catch(function () {
-                openImageForSave(canvas.toDataURL("image/png"), filename);
-                finish();
-              });
-          } else {
-            openImageForSave(canvas.toDataURL("image/png"), filename);
-            finish();
-          }
-        } else {
-          // 안드로이드/PC: 클릭 한 번으로 바로 파일 저장 (별도 시트 없음)
-          downloadBlobDirect(blob, filename);
-          finish();
-        }
-      }, "image/png");
-    }).catch(function (err) {
-      alert("이미지 생성에 실패했습니다: " + err);
-      finish();
-    });
-  }
-
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
@@ -810,7 +736,10 @@
     render();
   };
   document.getElementById("modeToggleBtn").onclick = toggleMode;
-  document.getElementById("captureBtn").onclick = captureChecklist;
+  document.getElementById("carNumberInput").oninput = function () {
+    carNumber = this.value;
+    saveData();
+  };
   document.getElementById("saveFileBtn").onclick = saveAsFile;
   document.getElementById("exportBtn").onclick = function () {
     copyText(JSON.stringify(ITEMS));
@@ -834,6 +763,7 @@
   };
 
   loadData();
+  document.getElementById("carNumberInput").value = carNumber;
   renderMode();
   render();
 </script>
