@@ -33,18 +33,17 @@
     color: #111827;
   }
 
-  .top-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .top-row { display: flex; gap: 8px; margin-bottom: 10px; }
   .filter-btn {
     flex: none;
-    padding: 8px 10px;
+    padding: 8px 16px;
     border-radius: 10px;
     border: 2px solid #111827;
     background: #fff;
     color: #111827;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: bold;
     cursor: pointer;
-    white-space: nowrap;
   }
   .filter-btn.inactive {
     border-color: #d1d5db;
@@ -66,39 +65,6 @@
   }
   #copyImageBtn:active { background: #f3f4f6; }
   #copyImageBtn[disabled] { opacity: 0.6; cursor: default; }
-
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.88);
-    z-index: 1000;
-    overflow: auto;
-    padding: 50px 12px 20px 12px;
-    box-sizing: border-box;
-    text-align: center;
-  }
-  .modal-overlay.open { display: block; }
-  .modal-overlay img {
-    max-width: 100%;
-    border-radius: 10px;
-    display: block;
-    margin: 0 auto;
-  }
-  .modal-close {
-    position: fixed;
-    top: 10px;
-    right: 12px;
-    z-index: 1001;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 20px;
-    background: #fff;
-    color: #111827;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-  }
 
   .table-card {
     background: #fff;
@@ -261,11 +227,6 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="defectModal">
-  <button type="button" class="modal-close" id="defectModalClose">✕ 닫기</button>
-  <img src="외관.jpg" alt="결함 이미지 예시" id="defectImg">
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   var DEFAULT_ITEMS = [
@@ -335,7 +296,6 @@
   function renderTopRow() {
     var row = document.getElementById("topRow");
     row.innerHTML = "";
-
     ITEMS.forEach(function (cat) {
       var btn = document.createElement("button");
       btn.type = "button";
@@ -347,13 +307,6 @@
       };
       row.appendChild(btn);
     });
-
-    var defectBtn = document.createElement("button");
-    defectBtn.type = "button";
-    defectBtn.className = "filter-btn";
-    defectBtn.textContent = "결함 이미지";
-    defectBtn.onclick = openDefectModal;
-    row.appendChild(defectBtn);
 
     var copyBtn = document.createElement("button");
     copyBtn.type = "button";
@@ -574,13 +527,6 @@
     });
   }
 
-  function openDefectModal() {
-    document.getElementById("defectModal").classList.add("open");
-  }
-  function closeDefectModal() {
-    document.getElementById("defectModal").classList.remove("open");
-  }
-
   document.getElementById("resetBtn").onclick = function () {
     state = {};
     carNumber = "";
@@ -591,10 +537,6 @@
   document.getElementById("carNumberInput").oninput = function () {
     carNumber = this.value;
     saveData();
-  };
-  document.getElementById("defectModalClose").onclick = closeDefectModal;
-  document.getElementById("defectModal").onclick = function (e) {
-    if (e.target === this) closeDefectModal();
   };
 
   loadData();
