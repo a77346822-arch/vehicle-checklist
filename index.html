@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   .noscript-warning {
-    max-width: 520px;
+    max-width: 560px;
     margin: 10px auto;
     padding: 14px;
     background: #fef2f2;
@@ -24,7 +24,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Segoe UI', sans-serif;
     color: #1f2430;
   }
-  .wrap { max-width: 520px; margin: 0 auto; padding: 10px 14px 14px 14px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 10px 14px 14px 14px; }
 
   h1 {
     font-size: 16px;
@@ -33,124 +33,12 @@
     color: #111827;
   }
 
-  .top-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .filter-btn {
-    flex: none;
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 2px solid #111827;
-    background: #fff;
-    color: #111827;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .filter-btn.inactive {
-    border-color: #d1d5db;
-    color: #9ca3af;
-    background: #f9fafb;
-  }
-  .filter-btn:active { background: #f3f4f6; }
-
-  #copyImageBtn {
-    flex: 1;
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 2px solid #111827;
-    background: #fff;
-    color: #111827;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  #copyImageBtn:active { background: #f3f4f6; }
-  #copyImageBtn[disabled] { opacity: 0.6; cursor: default; }
-
-  .table-card {
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(20,20,40,0.08);
-    border: 1px solid #e5e7eb;
-  }
-  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  thead th {
-    background: #f8fafc;
-    color: #374151;
-    font-size: 12px;
-    padding: 7px 4px;
-    border: 1px solid #d1d5db;
-  }
-  thead th:nth-child(1) { width: 60%; text-align: center; }
-  thead th:nth-child(2), thead th:nth-child(3) { width: 20%; text-align: center; }
-
-  tbody td {
-    border: 1px solid #d1d5db;
-    padding: 0;
-  }
-
-  .item-name {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    font-size: 12px;
-    line-height: 1.25;
-    padding: 8px 4px;
-    color: #000000;
-    overflow: hidden;
-  }
-  .item-name .name-static {
-    flex: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-  }
-
-  .empty-row { padding: 22px 14px; text-align: center; color: #9ca3af; font-size: 13px; }
-
-  .tapcell {
-    height: 42px;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    border-left: 1px solid #eef0f4;
-    user-select: none;
-    touch-action: manipulation;
-  }
-  .tapcell .mark {
-    display: inline-block;
-    width: 24px; height: 24px;
-    line-height: 24px;
-    font-size: 17px;
-    font-weight: bold;
-    color: transparent;
-  }
-  .tapcell.normal.selected { background: #ecfdf5; }
-  .tapcell.normal.selected .mark { color: #16a34a; }
-  .tapcell.abnormal.selected { background: #fef2f2; }
-  .tapcell.abnormal.selected .mark { color: #dc2626; }
-  .tapcell:active { background: #f1f5f9; }
-
-  .btn-row { display: flex; gap: 10px; margin-top: 10px; }
-  .btn-row button {
-    flex: 1;
-    padding: 9px 0;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 9px;
-    border: none;
-    cursor: pointer;
-  }
-  #resetBtn { background: #e5e7eb; color: #374151; }
-  #resetBtn:active { background: #d1d5db; }
-
   .car-number-group {
-    flex: 1;
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 0 10px;
+    margin-bottom: 10px;
     border-radius: 9px;
     background: #eef2ff;
     border: 1px solid #c7d2fe;
@@ -171,12 +59,108 @@
     font-weight: bold;
     line-height: 1.6;
     color: #111827;
-    padding: 11px 0 13px 0;
+    padding: 10px 0 11px 0;
     outline: none;
     text-align: center;
   }
 
-  #captureArea { background: #f3f5f8; padding-top: 2px; }
+  #captureArea { background: #f3f5f8; }
+
+  .table-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(20,20,40,0.08);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  table { border-collapse: collapse; width: 100%; min-width: 520px; }
+
+  thead th {
+    background: #f8fafc;
+    color: #111827;
+    font-size: 12.5px;
+    font-weight: bold;
+    padding: 9px 4px;
+    border-bottom: 2px solid #e5e7eb;
+    text-align: center;
+    white-space: nowrap;
+  }
+  thead th.th-cat { background: #1e3a6e; color: #fff; }
+  thead th.th-normal { color: #1d4ed8; }
+  thead th.th-abnormal { color: #dc2626; }
+
+  col.col-cat { width: 60px; }
+  col.col-item { width: 190px; }
+  col.col-normal { width: 56px; }
+  col.col-abnormal { width: 56px; }
+  col.col-note { width: 130px; }
+
+  td.cat-cell {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 8px 4px;
+    border-right: 1px solid #e5e7eb;
+  }
+  td.cat-cell.warranty { background: #eaf2fb; color: #1d4ed8; }
+  td.cat-cell.accident { background: #fbe9ea; color: #dc2626; }
+  td.cat-cell .cat-icon { width: 26px; height: 26px; margin: 0 auto 4px auto; }
+
+  td.item-cell {
+    padding: 8px 8px;
+    border-top: 1px solid #f1f3f6;
+    border-right: 1px solid #f1f3f6;
+  }
+  .item-inner { display: flex; align-items: center; gap: 8px; }
+  .item-icon {
+    flex: none;
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #4b5563;
+    background: #f3f4f6;
+  }
+  .warranty-row .item-icon { color: #1d4ed8; background: #eaf2fb; }
+  .accident-row .item-icon { color: #dc2626; background: #fbe9ea; }
+  .item-name { font-size: 13px; font-weight: bold; color: #111827; line-height: 1.3; }
+
+  td.tapcell {
+    border-top: 1px solid #f1f3f6;
+    border-right: 1px solid #f1f3f6;
+    text-align: center;
+    padding: 6px 4px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  td.tapcell .mark {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    font-size: 14px; font-weight: bold;
+    border: 1.5px solid #e5e7eb;
+    color: transparent;
+  }
+  td.tapcell.normal.selected .mark { background: #ecfdf5; border-color: #16a34a; color: #16a34a; }
+  td.tapcell.abnormal.selected .mark { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
+  td.tapcell:active .mark { background: #f1f5f9; }
+
+  td.note-cell { padding: 6px 6px; border-top: 1px solid #f1f3f6; }
+  td.note-cell input {
+    width: 100%;
+    font-size: 12px;
+    padding: 6px 7px;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    outline: none;
+    color: #374151;
+    background: #fafafa;
+  }
+  td.note-cell input:focus { border-color: #9ca3af; background: #fff; }
 
   .summary {
     margin-top: 8px;
@@ -185,6 +169,21 @@
     color: #6b7280;
   }
   .summary b { color: #111827; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+  .btn-row button {
+    flex: 1;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 9px;
+    border: 2px solid #111827;
+    background: #fff;
+    color: #111827;
+    cursor: pointer;
+  }
+  .btn-row button:active { background: #f3f4f6; }
+  #copyImageBtn[disabled] { opacity: 0.6; cursor: default; }
 </style>
 </head>
 <body>
@@ -197,20 +196,30 @@
 <div class="wrap" id="wrap">
   <h1>차량 점검 체크리스트</h1>
 
-  <div class="top-row" id="topRow"></div>
+  <div class="car-number-group">
+    <label for="carNumberInput">차번호</label>
+    <input type="text" id="carNumberInput" placeholder="4자리" />
+  </div>
 
   <div id="captureArea">
     <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>항목</th>
-            <th>정상</th>
-            <th>비정상</th>
-          </tr>
-        </thead>
-        <tbody id="checklistBody"></tbody>
-      </table>
+      <div class="table-scroll">
+        <table>
+          <colgroup>
+            <col class="col-cat"><col class="col-item"><col class="col-normal"><col class="col-abnormal"><col class="col-note">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="th-cat">구분</th>
+              <th>항목</th>
+              <th class="th-normal">정상</th>
+              <th class="th-abnormal">비정상</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody id="checklistBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="summary" id="summary"></div>
@@ -218,145 +227,127 @@
 
   <div class="btn-row">
     <button id="resetBtn">전체 초기화</button>
-    <div class="car-number-group">
-      <label for="carNumberInput">차번호</label>
-      <input type="text" id="carNumberInput" placeholder="4자리" />
-    </div>
+    <button id="copyImageBtn">이미지 저장</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-  var DEFAULT_ITEMS = [
-    { category: "실외", items: ["전조등 변색", "타이어 마모", "키드니 그릴 벗겨짐 ( G60 )", "휠 부식"] },
-    { category: "실내", items: ["시트커버 불량 (균열/겹쳐짐)", "에어백 주름"] }
+  var ICONS = {
+    headlight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>',
+    grille: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M3 14h18M9 6v12M15 6v12"/></svg>',
+    wheel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+    bumper: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l1.5-5A2 2 0 0 1 7.4 9.5h9.2a2 2 0 0 1 1.9 1.5L20 16"/><rect x="3" y="16" width="18" height="4" rx="1"/><circle cx="7.5" cy="20" r="1.3"/><circle cx="16.5" cy="20" r="1.3"/></svg>',
+    door: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 12h.01"/></svg>',
+    fender: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17a8 8 0 0 1 16 0"/><path d="M4 17h16"/><circle cx="12" cy="17" r="2"/></svg>',
+    glass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l2-8a2 2 0 0 1 2-1.5h10A2 2 0 0 1 19 7l2 8"/><path d="M3 15h18"/></svg>'
+  };
+
+  var DEFAULT_CATEGORIES = [
+    {
+      key: "보증", cls: "warranty", icon: "shield",
+      items: [
+        { name: "전조등 변색", icon: "headlight" },
+        { name: "키드니 그릴 벗겨짐", icon: "grille" },
+        { name: "휠 부식", icon: "wheel" }
+      ]
+    },
+    {
+      key: "사고", cls: "accident", icon: "alert",
+      items: [
+        { name: "앞유리 손상", icon: "glass" },
+        { name: "범퍼 손상", icon: "bumper" },
+        { name: "도어 손상", icon: "door" },
+        { name: "휀다 손상", icon: "fender" },
+        { name: "휠/타이어 손상", icon: "wheel" }
+      ]
+    }
   ];
 
-  // 아래 DEFAULT_ITEMS 목록을 수정할 때마다 이 숫자를 1씩 올려주세요.
-  // 그러면 이미 사용 중이던 기기에 저장된 예전 항목 목록 대신 새 목록으로 자동 갱신됩니다.
-  var ITEMS_VERSION = 4;
-
+  // DEFAULT_CATEGORIES 목록을 수정할 때마다 이 숫자를 1씩 올려주세요.
+  var ITEMS_VERSION = 6;
   var STORAGE_KEY = "vehicleChecklistData";
 
-  var ITEMS = [];
+  var CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
   var state = {};
+  var notes = {};
   var carNumber = "";
-  var activeCategory = null;
-
-  function isValidItems(x) {
-    return Array.isArray(x) && x.every(function (c) {
-      return c && typeof c.category === "string" && Array.isArray(c.items) &&
-        c.items.every(function (n) { return typeof n === "string"; });
-    });
-  }
 
   function loadData() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed.itemsVersion === ITEMS_VERSION && isValidItems(parsed.items)) {
-          // 코드의 항목 목록과 버전이 같으면 저장된 목록 사용
-          ITEMS = parsed.items;
-        } else {
-          // 버전이 다르면(코드의 기본 항목이 바뀌었으면) 최신 기본 목록으로 갱신
-          ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-        }
         state = parsed.checks || {};
+        notes = parsed.notes || {};
         carNumber = typeof parsed.carNumber === "string" ? parsed.carNumber : "";
-      } else {
-        ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-        state = {};
-        carNumber = "";
+        if (parsed.itemsVersion !== ITEMS_VERSION) {
+          CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+        }
       }
     } catch (e) {
-      ITEMS = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-      state = {};
-      carNumber = "";
-    }
-    if (!activeCategory || !ITEMS.some(function (cat) { return cat.category === activeCategory; })) {
-      activeCategory = ITEMS.length > 0 ? ITEMS[0].category : null;
+      state = {}; notes = {}; carNumber = "";
     }
   }
 
   function saveData() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: ITEMS, checks: state, carNumber: carNumber, itemsVersion: ITEMS_VERSION }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        checks: state, notes: notes, carNumber: carNumber, itemsVersion: ITEMS_VERSION
+      }));
     } catch (e) {}
   }
 
   function allNames() {
     var names = [];
-    ITEMS.forEach(function (cat) { cat.items.forEach(function (n) { names.push(n); }); });
+    CATEGORIES.forEach(function (cat) { cat.items.forEach(function (it) { names.push(it.name); }); });
     return names;
   }
 
-  function renderTopRow() {
-    var row = document.getElementById("topRow");
-    row.innerHTML = "";
-    ITEMS.forEach(function (cat) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "filter-btn" + (activeCategory === cat.category ? "" : " inactive");
-      btn.textContent = cat.category;
-      btn.onclick = function () {
-        activeCategory = cat.category;
-        render();
-      };
-      row.appendChild(btn);
-    });
-
-    var copyBtn = document.createElement("button");
-    copyBtn.type = "button";
-    copyBtn.id = "copyImageBtn";
-    copyBtn.textContent = "이미지 저장";
-    copyBtn.onclick = shareOrCopyImage;
-    row.appendChild(copyBtn);
-  }
-
   function render() {
-    renderTopRow();
-
     var body = document.getElementById("checklistBody");
     body.innerHTML = "";
 
-    var visibleItems = [];
-    ITEMS.forEach(function (cat) {
-      if (cat.category !== activeCategory) return;
-      cat.items.forEach(function (name) { visibleItems.push(name); });
-    });
+    CATEGORIES.forEach(function (cat) {
+      cat.items.forEach(function (it, idx) {
+        var tr = document.createElement("tr");
+        tr.className = cat.cls + "-row";
 
-    if (visibleItems.length === 0) {
-      var tr0 = document.createElement("tr");
-      var td0 = document.createElement("td");
-      td0.colSpan = 3;
-      td0.className = "empty-row";
-      td0.textContent = "표시할 점검 항목이 없습니다.";
-      tr0.appendChild(td0);
-      body.appendChild(tr0);
-      renderSummary();
-      return;
-    }
+        if (idx === 0) {
+          var catTd = document.createElement("td");
+          catTd.className = "cat-cell " + cat.cls;
+          catTd.rowSpan = cat.items.length;
+          catTd.innerHTML = '<div class="cat-icon">' + ICONS[cat.icon] + '</div><div>' + cat.key + '</div>';
+          tr.appendChild(catTd);
+        }
 
-    visibleItems.forEach(function (name) {
-      var tr = document.createElement("tr");
+        var itemTd = document.createElement("td");
+        itemTd.className = "item-cell";
+        itemTd.innerHTML =
+          '<div class="item-inner"><div class="item-icon">' + ICONS[it.icon] + '</div>' +
+          '<div class="item-name">' + it.name + '</div></div>';
+        tr.appendChild(itemTd);
 
-      var nameTd = document.createElement("td");
-      var nameDiv = document.createElement("div");
-      nameDiv.className = "item-name";
+        tr.appendChild(makeCell(it.name, "normal"));
+        tr.appendChild(makeCell(it.name, "abnormal"));
 
-      var nameStatic = document.createElement("span");
-      nameStatic.className = "name-static";
-      nameStatic.textContent = name;
-      nameDiv.appendChild(nameStatic);
+        var noteTd = document.createElement("td");
+        noteTd.className = "note-cell";
+        var noteInput = document.createElement("input");
+        noteInput.type = "text";
+        noteInput.placeholder = "내용 입력";
+        noteInput.value = notes[it.name] || "";
+        noteInput.oninput = function () {
+          notes[it.name] = this.value;
+          saveData();
+        };
+        noteTd.appendChild(noteInput);
+        tr.appendChild(noteTd);
 
-      nameTd.appendChild(nameDiv);
-      tr.appendChild(nameTd);
-
-      tr.appendChild(makeCell(name, "normal"));
-      tr.appendChild(makeCell(name, "abnormal"));
-
-      body.appendChild(tr);
+        body.appendChild(tr);
+      });
     });
 
     renderSummary();
@@ -364,8 +355,7 @@
 
   function makeCell(name, kind) {
     var td = document.createElement("td");
-    td.className = "tapcell " + kind;
-    if (state[name] === kind) td.className += " selected";
+    td.className = "tapcell " + kind + (state[name] === kind ? " selected" : "");
     var mark = document.createElement("span");
     mark.className = "mark";
     mark.textContent = "O";
@@ -375,11 +365,8 @@
   }
 
   function onTap(name, kind) {
-    if (state[name] === kind) {
-      delete state[name];
-    } else {
-      state[name] = kind;
-    }
+    if (state[name] === kind) delete state[name];
+    else state[name] = kind;
     saveData();
     render();
   }
@@ -398,20 +385,14 @@
     return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   }
-
-  function isAndroid() {
-    return /Android/.test(navigator.userAgent);
-  }
+  function isAndroid() { return /Android/.test(navigator.userAgent); }
 
   function openImageForCopyFallback(dataUrl, filename) {
     var win = window.open("", "_blank");
     if (!win) {
       var a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.href = dataUrl; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       return;
     }
     win.document.write(
@@ -428,15 +409,10 @@
   }
 
   function downloadBlobDirect(blob, filename) {
-    // 다운로드 폴더에 즉시 저장 (별도 시트 없음).
-    // 안드로이드는 다운로드 폴더가 갤러리(사진) 앱에도 자동으로 함께 표시됩니다.
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
@@ -463,45 +439,26 @@
       alert("이미지 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침 후 다시 시도해주세요.");
       return;
     }
-    // 화면에 실제로 보이는 전체 영역(제목, 탭 버튼, 표, 요약, 하단 버튼까지)을 그대로 캡처
     var target = document.getElementById("wrap");
     var originalLabel = btn.textContent;
     var filename = "차량점검.png";
 
-    function finish() {
-      btn.disabled = false;
-      btn.textContent = originalLabel;
-    }
+    function finish() { btn.disabled = false; btn.textContent = originalLabel; }
 
-    // 버튼 문구를 바꾸기 전에 먼저 캡처해서, "처리 중..." 글자가 이미지에 찍히지 않도록 함
     html2canvas(target, {
       backgroundColor: "#f3f5f8",
       scale: Math.max(2, window.devicePixelRatio || 1),
-      useCORS: true,
-      scrollX: 0,
-      scrollY: -window.scrollY
+      useCORS: true, scrollX: 0, scrollY: -window.scrollY
     }).then(function (canvas) {
-      btn.disabled = true;
-      btn.textContent = "처리 중...";
+      btn.disabled = true; btn.textContent = "처리 중...";
       canvas.toBlob(function (blob) {
-        if (!blob) {
-          alert("이미지 생성에 실패했습니다.");
-          finish();
-          return;
-        }
+        if (!blob) { alert("이미지 생성에 실패했습니다."); finish(); return; }
 
-        if (isAndroid()) {
-          // 안드로이드: 공유/클립보드 API가 기기마다 불안정하므로,
-          // 항상 성공하는 직접 다운로드 방식 사용 (다운로드 폴더 = 갤러리에 표시됨)
-          downloadBlobDirect(blob, filename);
-          finish();
-          return;
-        }
+        if (isAndroid()) { downloadBlobDirect(blob, filename); finish(); return; }
 
         var file = new File([blob], filename, { type: "image/png" });
 
         if (isIOS()) {
-          // 아이폰은 공유 시트에서 "이미지 저장"을 눌러야 사진 앱에 저장됨 (OS 정책상 우회 불가)
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({ files: [file], title: "차량 점검 체크리스트" })
               .then(finish)
@@ -516,7 +473,6 @@
           return;
         }
 
-        // PC 등 기타 환경: 클립보드 복사 우선, 실패 시 다운로드
         copyImageToClipboardFallback(blob, canvas, filename, finish);
       }, "image/png");
     }).catch(function (err) {
@@ -526,8 +482,7 @@
   }
 
   document.getElementById("resetBtn").onclick = function () {
-    state = {};
-    carNumber = "";
+    state = {}; notes = {}; carNumber = "";
     document.getElementById("carNumberInput").value = "";
     saveData();
     render();
@@ -536,6 +491,7 @@
     carNumber = this.value;
     saveData();
   };
+  document.getElementById("copyImageBtn").onclick = shareOrCopyImage;
 
   loadData();
   document.getElementById("carNumberInput").value = carNumber;
