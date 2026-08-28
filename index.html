@@ -336,13 +336,6 @@
     var row = document.getElementById("topRow");
     row.innerHTML = "";
 
-    var defectBtn = document.createElement("button");
-    defectBtn.type = "button";
-    defectBtn.className = "filter-btn";
-    defectBtn.textContent = "결함 이미지";
-    defectBtn.onclick = openDefectModal;
-    row.appendChild(defectBtn);
-
     ITEMS.forEach(function (cat) {
       var btn = document.createElement("button");
       btn.type = "button";
@@ -354,6 +347,13 @@
       };
       row.appendChild(btn);
     });
+
+    var defectBtn = document.createElement("button");
+    defectBtn.type = "button";
+    defectBtn.className = "filter-btn";
+    defectBtn.textContent = "결함 이미지";
+    defectBtn.onclick = openDefectModal;
+    row.appendChild(defectBtn);
 
     var copyBtn = document.createElement("button");
     copyBtn.type = "button";
