@@ -310,8 +310,8 @@
     var copyBtn = document.createElement("button");
     copyBtn.type = "button";
     copyBtn.id = "copyImageBtn";
-    copyBtn.textContent = "이미지 복사";
-    copyBtn.onclick = copyImageToClipboard;
+    copyBtn.textContent = "이미지 저장/공유";
+    copyBtn.onclick = shareOrCopyImage;
     row.appendChild(copyBtn);
   }
 
@@ -412,14 +412,31 @@
       "<style>body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;}" +
       "p{color:#fff;font-size:14px;line-height:1.5;text-align:center;padding:14px 16px;margin:0;background:#1f2430;}" +
       "img{width:100%;display:block;}</style></head><body>" +
-      "<p>👇 이미지를 <b>길게 눌러</b> <b>'이미지 복사'</b> 또는 <b>'이미지 저장'</b>을 선택하세요.</p>" +
+      "<p>👇 이미지를 <b>길게 눌러</b> <b>'이미지 저장'</b>을 선택하면 갤러리에 저장됩니다.</p>" +
       "<img src='" + dataUrl + "' alt='" + filename + "'>" +
       "</body></html>"
     );
     win.document.close();
   }
 
-  function copyImageToClipboard() {
+  function copyImageToClipboardFallback(blob, canvas, filename, finish) {
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+        .then(function () {
+          alert("이미지가 클립보드에 복사되었습니다. 원하는 곳에 붙여넣기(Ctrl+V) 하세요.");
+          finish();
+        })
+        .catch(function () {
+          openImageForCopyFallback(canvas.toDataURL("image/png"), filename);
+          finish();
+        });
+    } else {
+      openImageForCopyFallback(canvas.toDataURL("image/png"), filename);
+      finish();
+    }
+  }
+
+  function shareOrCopyImage() {
     var btn = document.getElementById("copyImageBtn");
     if (typeof html2canvas === "undefined") {
       alert("이미지 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침 후 다시 시도해주세요.");
@@ -427,8 +444,9 @@
     }
     var target = document.getElementById("captureArea");
     var originalLabel = btn.textContent;
+    var filename = "차량점검.png";
     btn.disabled = true;
-    btn.textContent = "복사 중...";
+    btn.textContent = "처리 중...";
 
     function finish() {
       btn.disabled = false;
@@ -446,19 +464,18 @@
           finish();
           return;
         }
-        if (navigator.clipboard && window.ClipboardItem) {
-          navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
-            .then(function () {
-              alert("이미지가 복사되었습니다. 원하는 곳(문자, 메신저 등)의 입력칸에 붙여넣기(꾹 누르거나 Ctrl+V) 하세요.");
-              finish();
-            })
+        var file = new File([blob], filename, { type: "image/png" });
+
+        // 1순위: OS 공유 시트 → "저장"으로 갤러리에 바로 저장하거나, 원하는 앱으로 바로 전달
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "차량 점검 체크리스트" })
+            .then(finish)
             .catch(function () {
-              openImageForCopyFallback(canvas.toDataURL("image/png"), "차량점검.png");
-              finish();
+              // 사용자가 취소했거나 공유가 실패하면 클립보드 복사로 대체
+              copyImageToClipboardFallback(blob, canvas, filename, finish);
             });
         } else {
-          openImageForCopyFallback(canvas.toDataURL("image/png"), "차량점검.png");
-          finish();
+          copyImageToClipboardFallback(blob, canvas, filename, finish);
         }
       }, "image/png");
     }).catch(function (err) {
