@@ -33,6 +33,39 @@
     color: #111827;
   }
 
+  .top-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .filter-btn {
+    flex: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 2px solid #111827;
+    background: #fff;
+    color: #111827;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .filter-btn.inactive {
+    border-color: #d1d5db;
+    color: #9ca3af;
+    background: #f9fafb;
+  }
+  .filter-btn:active { background: #f3f4f6; }
+
+  #copyImageBtn {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 2px solid #111827;
+    background: #fff;
+    color: #111827;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #copyImageBtn:active { background: #f3f4f6; }
+  #copyImageBtn[disabled] { opacity: 0.6; cursor: default; }
+
   .table-card {
     background: #fff;
     border-radius: 14px;
@@ -48,27 +81,12 @@
     padding: 7px 4px;
     border: 1px solid #d1d5db;
   }
-  thead th:nth-child(1) { width: 10%; text-align: center; }
-  thead th:nth-child(2) { width: 56%; text-align: center; }
-  thead th:nth-child(3), thead th:nth-child(4) { width: 17%; text-align: center; }
+  thead th:nth-child(1) { width: 60%; text-align: center; }
+  thead th:nth-child(2), thead th:nth-child(3) { width: 20%; text-align: center; }
 
   tbody td {
     border: 1px solid #d1d5db;
     padding: 0;
-  }
-
-  .category-cell {
-    text-align: center;
-    vertical-align: middle;
-    font-weight: bold;
-    font-size: 12.5px;
-    color: #374151;
-    background: #f8fafc;
-    border: 2px solid #d1d5db;
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    letter-spacing: 2px;
-    padding: 6px 0 !important;
   }
 
   .item-name {
@@ -178,14 +196,15 @@
   </div>
 </noscript>
 <div class="wrap">
-  <div id="captureArea">
-    <h1>차량 점검 체크리스트</h1>
+  <h1>차량 점검 체크리스트</h1>
 
+  <div class="top-row" id="topRow"></div>
+
+  <div id="captureArea">
     <div class="table-card">
       <table>
         <thead>
           <tr>
-            <th>구분</th>
             <th>항목</th>
             <th>정상</th>
             <th>비정상</th>
@@ -207,34 +226,28 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   var DEFAULT_ITEMS = [
-    { category: "실외", brands: [
-      { brand: "ALL", items: ["전조등 변색", "타이어 마모"] },
-      { brand: "BMW", items: ["키드니 그릴 벗겨짐 ( G60 )", "선루프 몰딩 변형 ( X시리즈 )", "휠 부식"] },
-      { brand: "MINI", items: [] }
-    ]},
-    { category: "실내", brands: [
-      { brand: "ALL", items: ["시트 커버 불량(균열 / 겹쳐짐)"] },
-      { brand: "BMW", items: ["에어백 주름"] }
-    ]}
+    { category: "실외", items: ["전조등 변색", "타이어 마모", "키드니 그릴 벗겨짐 ( G60 )", "휠 부식"] },
+    { category: "실내", items: ["시트커버 불량 (균열/겹쳐짐)", "에어백 주름"] }
   ];
 
   // 아래 DEFAULT_ITEMS 목록을 수정할 때마다 이 숫자를 1씩 올려주세요.
   // 그러면 이미 사용 중이던 기기에 저장된 예전 항목 목록 대신 새 목록으로 자동 갱신됩니다.
-  var ITEMS_VERSION = 3;
-
+  var ITEMS_VERSION = 4;
 
   var STORAGE_KEY = "vehicleChecklistData";
 
   var ITEMS = [];
   var state = {};
   var carNumber = "";
+  var activeCategory = null;
 
   function isValidItems(x) {
     return Array.isArray(x) && x.every(function (c) {
-      return c && typeof c.category === "string" && Array.isArray(c.brands) &&
-        c.brands.every(function (b) { return b && typeof b.brand === "string" && Array.isArray(b.items); });
+      return c && typeof c.category === "string" && Array.isArray(c.items) &&
+        c.items.every(function (n) { return typeof n === "string"; });
     });
   }
 
@@ -262,6 +275,9 @@
       state = {};
       carNumber = "";
     }
+    if (!activeCategory || !ITEMS.some(function (cat) { return cat.category === activeCategory; })) {
+      activeCategory = ITEMS.length > 0 ? ITEMS[0].category : null;
+    }
   }
 
   function saveData() {
@@ -272,26 +288,49 @@
 
   function allNames() {
     var names = [];
-    ITEMS.forEach(function (cat) {
-      cat.brands.forEach(function (b) { b.items.forEach(function (n) { names.push(n); }); });
-    });
+    ITEMS.forEach(function (cat) { cat.items.forEach(function (n) { names.push(n); }); });
     return names;
   }
 
-  function categoryItemCount(cat) {
-    var n = 0;
-    cat.brands.forEach(function (b) { n += b.items.length; });
-    return n;
+  function renderTopRow() {
+    var row = document.getElementById("topRow");
+    row.innerHTML = "";
+    ITEMS.forEach(function (cat) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "filter-btn" + (activeCategory === cat.category ? "" : " inactive");
+      btn.textContent = cat.category;
+      btn.onclick = function () {
+        activeCategory = cat.category;
+        render();
+      };
+      row.appendChild(btn);
+    });
+
+    var copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.id = "copyImageBtn";
+    copyBtn.textContent = "이미지 복사";
+    copyBtn.onclick = copyImageToClipboard;
+    row.appendChild(copyBtn);
   }
 
   function render() {
+    renderTopRow();
+
     var body = document.getElementById("checklistBody");
     body.innerHTML = "";
 
-    if (allNames().length === 0) {
+    var visibleItems = [];
+    ITEMS.forEach(function (cat) {
+      if (cat.category !== activeCategory) return;
+      cat.items.forEach(function (name) { visibleItems.push(name); });
+    });
+
+    if (visibleItems.length === 0) {
       var tr0 = document.createElement("tr");
       var td0 = document.createElement("td");
-      td0.colSpan = 4;
+      td0.colSpan = 3;
       td0.className = "empty-row";
       td0.textContent = "표시할 점검 항목이 없습니다.";
       tr0.appendChild(td0);
@@ -300,45 +339,27 @@
       return;
     }
 
-    ITEMS.forEach(function (cat) {
-      var catTotal = categoryItemCount(cat);
-      if (catTotal === 0) return;
-      var catCellPlaced = false;
+    visibleItems.forEach(function (name) {
+      var tr = document.createElement("tr");
 
-      cat.brands.forEach(function (b) {
-        if (b.items.length === 0) return;
+      var nameTd = document.createElement("td");
+      var nameDiv = document.createElement("div");
+      nameDiv.className = "item-name";
 
-        b.items.forEach(function (name, i) {
-          var tr = document.createElement("tr");
+      var nameStatic = document.createElement("span");
+      nameStatic.className = "name-static";
+      nameStatic.textContent = name;
+      nameDiv.appendChild(nameStatic);
 
-          if (!catCellPlaced) {
-            var catTd = document.createElement("td");
-            catTd.className = "category-cell";
-            catTd.rowSpan = catTotal;
-            catTd.textContent = cat.category;
-            tr.appendChild(catTd);
-            catCellPlaced = true;
-          }
+      nameTd.appendChild(nameDiv);
+      tr.appendChild(nameTd);
 
-          var nameTd = document.createElement("td");
-          var nameDiv = document.createElement("div");
-          nameDiv.className = "item-name";
+      tr.appendChild(makeCell(name, "normal"));
+      tr.appendChild(makeCell(name, "abnormal"));
 
-          var nameStatic = document.createElement("span");
-          nameStatic.className = "name-static";
-          nameStatic.textContent = name;
-          nameDiv.appendChild(nameStatic);
-
-          nameTd.appendChild(nameDiv);
-          tr.appendChild(nameTd);
-
-          tr.appendChild(makeCell(name, "normal"));
-          tr.appendChild(makeCell(name, "abnormal"));
-
-          body.appendChild(tr);
-        });
-      });
+      body.appendChild(tr);
     });
+
     renderSummary();
   }
 
@@ -372,6 +393,78 @@
     document.getElementById("summary").innerHTML =
       "점검 완료: <b>" + checked + "</b> / " + total +
       "&nbsp;&nbsp;·&nbsp;&nbsp;비정상: <b>" + abnormal + "</b>건";
+  }
+
+  function openImageForCopyFallback(dataUrl, filename) {
+    var win = window.open("", "_blank");
+    if (!win) {
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+    win.document.write(
+      "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + filename + "</title>" +
+      "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+      "<style>body{margin:0;background:#111;font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;}" +
+      "p{color:#fff;font-size:14px;line-height:1.5;text-align:center;padding:14px 16px;margin:0;background:#1f2430;}" +
+      "img{width:100%;display:block;}</style></head><body>" +
+      "<p>👇 이미지를 <b>길게 눌러</b> <b>'이미지 복사'</b> 또는 <b>'이미지 저장'</b>을 선택하세요.</p>" +
+      "<img src='" + dataUrl + "' alt='" + filename + "'>" +
+      "</body></html>"
+    );
+    win.document.close();
+  }
+
+  function copyImageToClipboard() {
+    var btn = document.getElementById("copyImageBtn");
+    if (typeof html2canvas === "undefined") {
+      alert("이미지 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침 후 다시 시도해주세요.");
+      return;
+    }
+    var target = document.getElementById("captureArea");
+    var originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "복사 중...";
+
+    function finish() {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+
+    html2canvas(target, {
+      backgroundColor: "#ffffff",
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    }).then(function (canvas) {
+      canvas.toBlob(function (blob) {
+        if (!blob) {
+          alert("이미지 생성에 실패했습니다.");
+          finish();
+          return;
+        }
+        if (navigator.clipboard && window.ClipboardItem) {
+          navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+            .then(function () {
+              alert("이미지가 복사되었습니다. 원하는 곳(문자, 메신저 등)의 입력칸에 붙여넣기(꾹 누르거나 Ctrl+V) 하세요.");
+              finish();
+            })
+            .catch(function () {
+              openImageForCopyFallback(canvas.toDataURL("image/png"), "차량점검.png");
+              finish();
+            });
+        } else {
+          openImageForCopyFallback(canvas.toDataURL("image/png"), "차량점검.png");
+          finish();
+        }
+      }, "image/png");
+    }).catch(function (err) {
+      alert("이미지 생성에 실패했습니다: " + err);
+      finish();
+    });
   }
 
   document.getElementById("resetBtn").onclick = function () {
