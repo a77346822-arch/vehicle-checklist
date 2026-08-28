@@ -688,6 +688,11 @@
       "_" + pad2(now.getHours()) + pad2(now.getMinutes()) + ".png";
   }
 
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
   function openImageForSave(dataUrl, filename) {
     var win = window.open("", "_blank");
     if (!win) {
@@ -710,6 +715,19 @@
       "</body></html>"
     );
     win.document.close();
+  }
+
+  function downloadBlobDirect(blob, filename) {
+    // Android/PC: 다운로드 링크를 즉시 클릭 → 별도 시트 없이 바로 저장됨
+    // (안드로이드는 다운로드 폴더가 갤러리 앱에도 함께 표시됨)
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
   function captureChecklist() {
@@ -740,20 +758,26 @@
           return;
         }
         var filename = buildFilename();
-        var file = new File([blob], filename, { type: "image/png" });
 
-        // 1순위: 공유 시트에서 "이미지 저장/갤러리에 저장" 선택 → 앨범에 바로 반영
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "차량 점검 체크리스트" })
-            .then(finish)
-            .catch(function () {
-              // 사용자가 취소했거나 공유가 실패한 경우, 길게 눌러 저장할 수 있게 표시
-              openImageForSave(canvas.toDataURL("image/png"), filename);
-              finish();
-            });
+        if (isIOS()) {
+          // iOS는 브라우저 정책상 버튼 클릭만으로 사진 앱에 바로 쓸 수 없고,
+          // 반드시 시스템 공유 시트에서 사용자가 "이미지 저장"을 한 번 눌러야
+          // 사진 앱에 저장됩니다. (Safari의 보안 정책으로, 웹사이트는 우회할 수 없습니다)
+          var file = new File([blob], filename, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: "차량 점검 체크리스트" })
+              .then(finish)
+              .catch(function () {
+                openImageForSave(canvas.toDataURL("image/png"), filename);
+                finish();
+              });
+          } else {
+            openImageForSave(canvas.toDataURL("image/png"), filename);
+            finish();
+          }
         } else {
-          // 공유를 지원하지 않는 브라우저: 새 탭에 이미지를 띄워 길게 눌러 저장
-          openImageForSave(canvas.toDataURL("image/png"), filename);
+          // 안드로이드/PC: 클릭 한 번으로 바로 파일 저장 (별도 시트 없음)
+          downloadBlobDirect(blob, filename);
           finish();
         }
       }, "image/png");
