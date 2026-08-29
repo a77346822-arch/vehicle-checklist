@@ -24,25 +24,18 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Segoe UI', sans-serif;
     color: #1f2430;
   }
-  .wrap { max-width: 560px; margin: 0 auto; padding: 10px 14px 14px 14px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 4px 8px 4px 8px; }
 
-  h1 {
-    font-size: 16px;
-    text-align: center;
-    margin: 3px 0 10px 0;
-    color: #111827;
-  }
-
-  .top-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .top-row { display: flex; gap: 5px; margin-bottom: 4px; }
 
   .filter-btn {
     flex: 1;
-    padding: 9px 10px;
+    padding: 4px 6px;
     border-radius: 10px;
     border: 2px solid #111827;
     background: #fff;
     color: #111827;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
   }
@@ -55,12 +48,12 @@
 
   #copyImageBtn {
     flex: 1;
-    padding: 9px 10px;
+    padding: 4px 6px;
     border-radius: 10px;
     border: 2px solid #111827;
     background: #fff;
     color: #111827;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
   }
@@ -77,9 +70,10 @@
   table { width: 100%; border-collapse: collapse; table-layout: auto; }
 
   thead th {
-    font-size: 12.5px;
-    padding: 9px 3px;
+    font-size: 11.5px;
+    padding: 4px 2px;
     border: 1px solid #cbd2dd;
+    white-space: nowrap;
   }
   thead th.col-group { background: #0b1c42; color: #fff; text-align: center; }
   thead th.col-item { background: #f8fafc; color: #111827; text-align: center; }
@@ -95,23 +89,23 @@
     text-align: center;
     vertical-align: middle;
     font-weight: bold;
-    font-size: 14px;
-    padding: 6px 2px;
+    font-size: 11.5px;
+    padding: 2px 2px;
   }
   .group-cell.warranty { background: #dfeafc; color: #1d4ed8; }
   .group-cell.accident { background: #fbe1e2; color: #dc2626; }
-  .group-cell .g-icon { display: block; margin: 0 auto 4px auto; width: 26px; height: 26px; }
+  .group-cell .g-icon { display: block; margin: 0 auto 2px auto; width: 18px; height: 18px; }
 
-  .item-cell { padding: 8px 6px; }
-  .item-name { display: flex; align-items: center; gap: 8px; }
+  .item-cell { padding: 2px 4px; }
+  .item-name { display: flex; align-items: center; gap: 6px; }
   .item-name .p-icon { flex: none; }
   .item-name .name-text { flex: 1; min-width: 0; }
-  .item-name .name-text .nm { display: block; font-weight: bold; font-size: 13.5px; color: #000; line-height: 1.3; }
-  .item-name .name-text .ds { display: block; color: #444; font-weight: normal; font-size: 11.5px; line-height: 1.3; margin-top: 1px; }
+  .item-name .name-text .nm { display: block; font-weight: bold; font-size: 12px; color: #000; line-height: 1.2; }
+  .item-name .name-text .ds { display: block; color: #444; font-weight: normal; font-size: 10px; line-height: 1.2; margin-top: 1px; }
 
   .tapcell {
-    width: 58px;
-    height: 58px;
+    width: 44px;
+    height: 44px;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
@@ -121,10 +115,10 @@
   }
   .tapcell .mark {
     display: inline-block;
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 3px solid transparent;
+    border: 2.5px solid transparent;
     box-sizing: border-box;
   }
   .tapcell.normal.selected .mark { border-color: #16a34a; background: #ecfdf5; }
@@ -143,11 +137,11 @@
     line-height: 1.6;
   }
 
-  .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+  .btn-row { display: flex; gap: 6px; margin-top: 4px; }
   .btn-row button {
     flex: 1;
-    padding: 9px 0;
-    font-size: 13px;
+    padding: 4px 0;
+    font-size: 11.5px;
     font-weight: bold;
     border-radius: 9px;
     border: none;
@@ -160,15 +154,15 @@
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 10px;
+    gap: 5px;
+    padding: 0 8px;
     border-radius: 9px;
     background: #eef2ff;
     border: 1px solid #c7d2fe;
   }
   .car-number-group label {
     flex: none;
-    font-size: 12.5px;
+    font-size: 11px;
     font-weight: bold;
     color: #3730a3;
     white-space: nowrap;
@@ -178,21 +172,21 @@
     min-width: 0;
     border: none;
     background: transparent;
-    font-size: 13.5px;
+    font-size: 12px;
     font-weight: bold;
-    line-height: 1.6;
+    line-height: 1.3;
     color: #111827;
-    padding: 11px 0 13px 0;
+    padding: 4px 0;
     outline: none;
     text-align: center;
   }
 
-  #captureArea { background: #f3f5f8; padding-top: 2px; }
+  #captureArea { background: #f3f5f8; padding-top: 0; }
 
   .summary {
-    margin-top: 8px;
+    margin-top: 3px;
     text-align: center;
-    font-size: 12px;
+    font-size: 10.5px;
     color: #6b7280;
   }
   .summary b { color: #111827; }
@@ -206,7 +200,6 @@
   </div>
 </noscript>
 <div class="wrap" id="wrap">
-  <h1>차량 점검 체크리스트</h1>
 
   <div class="top-row" id="topRow">
     <button type="button" class="filter-btn" id="tabOutdoor">실외</button>
@@ -220,8 +213,8 @@
         <colgroup>
           <col style="width:13%;">
           <col>
-          <col style="width:58px;">
-          <col style="width:58px;">
+          <col style="width:44px;">
+          <col style="width:44px;">
         </colgroup>
         <thead>
           <tr>
